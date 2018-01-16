@@ -238,7 +238,7 @@ bytes processDataOrCode(json_spirit::mObject const& _o, string const& nodeName)
         return bytes();
     if (_o.at(nodeName).type() == json_spirit::str_type)
         if (_o.at(nodeName).get_str().find("0x") != 0)
-            ret = fromHex(replaceLLL(_o.at(nodeName).get_str()));
+            ret = fromHex(replaceBytecode(_o.at(nodeName).get_str()));
         else
             ret = importByteArray(_o.at(nodeName).get_str());
     else if (_o.at(nodeName).type() == json_spirit::array_type)
@@ -254,7 +254,7 @@ bytes importData(json_spirit::mObject const& _o)
     return processDataOrCode(_o, "data");
 }
 
-string replaceLLL(string const& _code)
+string replaceBytecode(string const& _code)
 {
     string compiledCode = compileLLL(_code);
     if (_code.size() > 0)
@@ -263,7 +263,7 @@ string replaceLLL(string const& _code)
     return compiledCode;
 }
 
-void replaceLLLinState(json_spirit::mObject& _o)
+void replaceBytecodeinState(json_spirit::mObject& _o)
 {
     json_spirit::mObject& fieldsObj = _o.count("alloc") ?
                                           _o["alloc"].get_obj() :
@@ -272,7 +272,7 @@ void replaceLLLinState(json_spirit::mObject& _o)
     {
         auto obj = account.second.get_obj();
         if (obj.count("code") && obj["code"].type() == json_spirit::str_type)
-            obj["code"] = replaceLLL(obj["code"].get_str());
+            obj["code"] = replaceBytecode(obj["code"].get_str());
         account.second = obj;
 	}
 }
